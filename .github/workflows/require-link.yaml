@@ -11,9 +11,9 @@ jobs:
   validate_pr:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      REPO: ${{ github.event.repository }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      REPO: "${{ github.event.repository }}"
+      PR_NUMBER: "${{ github.event.pull_request.number }}"
     steps:
       - run: |
           PR_DETAILS=$(gh api /repos/${REPO}/pulls/${PR_NUMBER})
