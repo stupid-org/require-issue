@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Validate Description
         run: |
-          set -x
+          set -x +e
           PR_DETAILS=$(gh api /repos/${REPO}/pulls/${PR_NUMBER})
           PR_DESC=$(echo ${PR_DETAILS} | jq -r .body)
 
