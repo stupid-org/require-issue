@@ -46,7 +46,7 @@ jobs:
           function notLinked() {
             gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${MISSING_LINK_MSG}"
             if [ $? -eq 0 ]; then
-              exit 0
+              return 0
             fi
             gh issue comment -R ${REPO} ${PR_NUMBER} --body "${MISSING_LINK_MSG}"
           }
