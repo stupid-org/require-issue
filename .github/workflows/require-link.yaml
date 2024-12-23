@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Validate Description
         run: |
+          set -x
           PR_DETAILS=$(gh api /repos/${REPO}/pulls/${PR_NUMBER})
           PR_DESC=$(echo ${PR_DETAILS} | jq -r .body)
 
@@ -35,7 +36,7 @@ jobs:
           }
 
           function allClear() {
-            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${ALL_CLEAR_MSG}" 2>&1 > /dev/null
+            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${ALL_CLEAR_MSG}"
             if [ $? -eq 0 ]; then
               exit 0
             fi
@@ -43,7 +44,7 @@ jobs:
           }
 
           function notLinked() {
-            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${MISSING_LINK_MSG}" 2>&1 > /dev/null
+            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${MISSING_LINK_MSG}"
             if [ $? -eq 0 ]; then
               exit 0
             fi
