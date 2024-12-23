@@ -12,11 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_REPO: ${{ github.event.repository }}
+      REPO: ${{ github.repository }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
-      - run: |
-          PR_DETAILS=$(gh api /repos/${GITHUB_REPO}/pulls/${PR_NUMBER})
+      - name: Validate Description
+        run: |
+          set -x +e
+          PR_DETAILS=$(gh api /repos/${REPO}/pulls/${PR_NUMBER})
           PR_DESC=$(echo ${PR_DETAILS} | jq -r .body)
 
           URL="https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword"
@@ -29,24 +31,24 @@ jobs:
           RESOLVE_PATTERN="resolve(s|d)?\s+${ISSUE_PATTERN}"
 
           function match() {
-            node -e "process.exitCode = /${2}/i.test('${1}') === true ? 0 : 1"
+            node -e "process.exitCode = /${2}/gim.test('${1}') === true ? 0 : 1"
             return ${?}
           }
 
           function allClear() {
-            gh issue comment -R ${GITHUB_REPO} ${PR_NUMBER} --edit-last --body "${ALL_CLEAR_MSG}" 2>&1 > /dev/null
+            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${ALL_CLEAR_MSG}"
             if [ $? -eq 0 ]; then
               exit 0
             fi
-            gh issue comment -R ${GITHUB_REPO} ${PR_NUMBER} --body "${ALL_CLEAR_MSG}"
+            gh issue comment -R ${REPO} ${PR_NUMBER} --body "${ALL_CLEAR_MSG}"
           }
 
           function notLinked() {
-            gh issue comment -R ${GITHUB_REPO} ${PR_NUMBER} --edit-last --body "${MISSING_LINK_MSG}" 2>&1 > /dev/null
+            gh issue comment -R ${REPO} ${PR_NUMBER} --edit-last --body "${MISSING_LINK_MSG}"
             if [ $? -eq 0 ]; then
-              exit 0
+              return 0
             fi
-            gh issue comment -R ${GITHUB_REPO} ${PR_NUMBER} --body "${MISSING_LINK_MSG}"
+            gh issue comment -R ${REPO} ${PR_NUMBER} --body "${MISSING_LINK_MSG}"
           }
 
           match "${PR_DESC}" "${CLOSE_PATTERN}"
